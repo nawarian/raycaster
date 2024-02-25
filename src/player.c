@@ -4,12 +4,12 @@
 #include "globals.h"
 #include "player.h"
 
-Vector2 coords = { 0 };
+player_t player;
 
 void player_create(void)
 {
-  coords.x = screen_plane_w / 2;
-  coords.y = screen_plane_h / 2;
+  player.pos.x = 5.5f;
+  player.pos.y = 2.5f;
 }
 
 void player_update(void)
@@ -18,16 +18,20 @@ void player_update(void)
     IsKeyDown(KEY_D) - IsKeyDown(KEY_A),
     IsKeyDown(KEY_S) - IsKeyDown(KEY_W)
   };
+  delta = Vector2Scale(delta, 0.1f);
 
-  coords = Vector2Add(coords, delta);
+  player.pos = Vector2Add(player.pos, delta);
 }
 
 void player_draw(void)
 {
-  DrawCircleV(coords, 5.0f, RED);
+  if (render_mode != RENDER2D) return;
+
+  DrawCircleV(Vector2Scale(player.pos, wall_size), 4.0f, RED);
 }
 
 void player_destroy(void)
 {
+  player = (player_t) { 0 };
 }
 

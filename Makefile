@@ -9,6 +9,7 @@ SRCDIR		= src
 BUILDDIR	= build
 LIBSDIR		= libs
 RAYLIBDIR	= $(LIBSDIR)/raylib/src
+RESDIR		= resources
 
 # Output name
 GAME_NAME	?= game
@@ -41,7 +42,7 @@ ifeq ($(PLATFORM), PLATFORM_WEB)
 	CFLAGS				+= -DPLATFORM_WEB
 	LDFLAGS				+= -s USE_GLFW=3 -s TOTAL_MEMORY=$(WEB_HEAP_SIZE) -s FORCE_FILESYSTEM=1
 	LDFLAGS				+= -s USE_PTHREADS=1 -s ASYNCIFY -O3
-	LDFLAGS				+= --shell-file $(WEB_SHELL)
+	LDFLAGS				+= --shell-file $(WEB_SHELL) --preload-file $(RESDIR)
 endif
 
 # Rules

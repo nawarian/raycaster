@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <raymath.h>
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
@@ -8,9 +9,11 @@
 #include "player.h"
 #include "world.h"
 
+RenderMode render_mode;
 RenderTexture2D framebuff;
 
-Camera2D cam = { 0 };
+Camera2D cam = { 0 }; // game cam
+Camera2D tex_cam = { 0 }; // render cam
 float zoom = 4.0f;
 
 void Create(void)
@@ -20,13 +23,17 @@ void Create(void)
   framebuff = LoadRenderTexture(screen_plane_w, screen_plane_h);
   while (!IsRenderTextureReady(framebuff));
 
+  render_mode = RENDER2D;
+
   world_create();
   player_create();
 }
 
 void Update(void)
 {
-  cam.zoom = zoom;
+  if (IsKeyPressed(KEY_TAB)) {
+    render_mode = !render_mode;
+  }
 
   player_update();
   world_update();
@@ -34,20 +41,34 @@ void Update(void)
 
 void Draw(void)
 {
+  // Reset texture mode zoom
+  tex_cam.zoom = zoom;
+  tex_cam.target = Vector2Zero();
+  tex_cam.offset = Vector2Zero();
+
+  // Update in-game camera to follow player
+  cam.zoom = 1.0f;
+  cam.target = Vector2Scale(player.pos, wall_size);
+  cam.offset = (Vector2) { (float) screen_plane_w / 2, (float) screen_plane_h / 2};
+
   BeginTextureMode(framebuff);
     ClearBackground(BLACK);
 
-    world_draw();
-    player_draw();
+    BeginMode2D(cam);
+      world_draw();
+      player_draw();
+    EndMode2D();
   EndTextureMode();
 
-  BeginMode2D(cam);
+  BeginMode2D(tex_cam);
     ClearBackground(BLACK);
 
-    DrawTextureRec(
+    DrawTexturePro(
       framebuff.texture,
       (Rectangle) { 0, 0, screen_plane_w, -screen_plane_h },
-      (Vector2) { 0 },
+      (Rectangle) { 0, 0, screen_plane_w, screen_plane_h },
+      (Vector2) { 0, 0 },
+      0.0f,
       WHITE
     );
   EndMode2D();
@@ -58,6 +79,7 @@ void Draw(void)
 void UpdateDraw(void)
 {
   Update();
+
   BeginDrawing();
     Draw();
   EndDrawing();
