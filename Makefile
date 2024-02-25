@@ -17,7 +17,9 @@ ifeq ($(PLATFORM), PLATFORM_WEB)
 endif
 
 # Game objects to be compiled
-GAME_OBJS	= $(BUILDDIR)/game.o
+GAME_OBJS	= $(BUILDDIR)/game.o \
+						$(BUILDDIR)/world.o \
+						$(BUILDDIR)/player.o
 
 # Compiler flags
 CC				?= cc

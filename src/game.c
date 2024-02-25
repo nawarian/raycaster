@@ -4,45 +4,76 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#define screen_plane_w 320
-#define screen_plane_h 240
+#include "globals.h"
+#include "player.h"
+#include "world.h"
 
 RenderTexture2D framebuff;
 
 Camera2D cam = { 0 };
 float zoom = 4.0f;
 
-void UpdateDraw(void)
-{
-  cam.zoom = zoom;
-
-  BeginDrawing();
-
-    BeginTextureMode(framebuff);
-      ClearBackground(BLACK);
-
-      DrawCircle(screen_plane_w / 2, screen_plane_h / 2, 5.0f, RED);
-    EndTextureMode();
-
-    BeginMode2D(cam);
-      DrawTextureRec(
-        framebuff.texture,
-        (Rectangle) { 0, 0, screen_plane_w, -screen_plane_h },
-        (Vector2) { 0 },
-        WHITE
-      );
-    EndMode2D();
-
-    DrawFPS(0, 0);
-  EndDrawing();
-}
-
-int main(void)
+void Create(void)
 {
   InitWindow(screen_plane_w * zoom, screen_plane_h * zoom, "Raycaster");
 
   framebuff = LoadRenderTexture(screen_plane_w, screen_plane_h);
   while (!IsRenderTextureReady(framebuff));
+
+  world_create();
+  player_create();
+}
+
+void Update(void)
+{
+  cam.zoom = zoom;
+
+  player_update();
+  world_update();
+}
+
+void Draw(void)
+{
+  BeginTextureMode(framebuff);
+    ClearBackground(BLACK);
+
+    world_draw();
+    player_draw();
+  EndTextureMode();
+
+  BeginMode2D(cam);
+    ClearBackground(BLACK);
+
+    DrawTextureRec(
+      framebuff.texture,
+      (Rectangle) { 0, 0, screen_plane_w, -screen_plane_h },
+      (Vector2) { 0 },
+      WHITE
+    );
+  EndMode2D();
+
+  DrawFPS(0, 0);
+}
+
+void UpdateDraw(void)
+{
+  Update();
+  BeginDrawing();
+    Draw();
+  EndDrawing();
+}
+
+void Destroy(void)
+{
+  player_destroy();
+  world_destroy();
+
+  CloseWindow();
+}
+
+int main(void)
+{
+  Create();
 
 #if defined(PLATFORM_WEB)
   emscripten_set_main_loop(UpdateDraw, 120, 1);
@@ -55,7 +86,7 @@ int main(void)
   }
 #endif
 
-  CloseWindow();
+  Destroy();
 
   return 0;
 }
