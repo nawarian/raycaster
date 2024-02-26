@@ -1,0 +1,27 @@
+name: Github Pages build
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Emscripten SDK
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install latest
+          ./emsdk activate latest
+          source ./emsdk_env.sh
+      - name: Build Web
+        run: |
+          source "/home/runner/work/raycaster/raycaster/emsdk/emsdk_env.sh"
+          PLATFORM=PLATFORM_WEB make clean all
+          rm docs/*.o
+
