@@ -6,6 +6,7 @@
 typedef struct {
   Vector2 pos;
   float angle;
+  float fov;
 } player_t;
 
 extern player_t player;
