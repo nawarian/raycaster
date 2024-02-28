@@ -48,8 +48,12 @@ void Draw(void)
 
   // Update in-game camera to follow player
   cam.zoom = 1.0f;
-  cam.target = Vector2Scale(player.pos, wall_size);
-  cam.offset = (Vector2) { (float) screen_plane_w / 2, (float) screen_plane_h / 2};
+  cam.target = Vector2Zero();
+  cam.offset = Vector2Zero();
+  if (render_mode == RENDER2D) {
+    cam.target = Vector2Scale(player.pos, wall_size);
+    cam.offset = (Vector2) { (float) screen_plane_w / 2, (float) screen_plane_h / 2};
+  }
 
   BeginTextureMode(framebuff);
     ClearBackground(BLACK);

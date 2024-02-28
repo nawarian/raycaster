@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "globals.h"
+#include "raymath.h"
 #include "world.h"
 
 world_t world;
@@ -88,8 +89,51 @@ void _draw2D(void)
   }
 }
 
+// TODO: refactor to use DDA instead of a 1/64.0f factor
 void _draw3D(void)
 {
+  float player_angle = Wrap(player.angle - PI, 0.0f, 2 * PI);
+  float fov_unit = player.fov / screen_plane_w;
+  float half_screen = screen_plane_h / 2;
+
+  Color colors[] = {
+    WHITE,
+    RED,
+    GRAY,
+  };
+
+  for (int x = 0; x < screen_plane_w; ++x) {
+    // Calculate coords of next wall
+    float angle = Wrap((fov_unit * x) + player_angle - (player.fov / 2.0f), 0.0f, 2 * PI);
+    Vector2 dir = (Vector2) {
+      cosf(angle),
+      sinf(angle),
+    };
+
+    Vector2 end = player.pos;
+    WallKind wall;
+    while (true) {
+      wall = world.walls[(int) end.y][(int) end.x];
+      if (wall != WALL_NONE) {
+        break;
+      }
+
+      end = Vector2Add(end, Vector2Scale(dir, 1/64.0f));
+    }
+
+    float dist = Vector2Distance(player.pos, end);
+    dist *= cosf(angle - player_angle);
+
+    float wall_height = screen_plane_h / dist;
+
+    DrawLine(
+      x,
+      half_screen - wall_height * 0.4,
+      x,
+      half_screen + wall_height * 0.4,
+      ColorAlpha(colors[wall], 1/dist)
+    );
+  }
 }
 
 void world_draw(void)
