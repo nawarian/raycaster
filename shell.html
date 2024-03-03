@@ -38,7 +38,15 @@
             justify-content: center;
             background: #000;
         }
-        canvas.emscripten { border: 1px solid gold; background-color: black; }
+        canvas.emscripten {
+            border: 0;
+            background-color: black;
+
+            --ratio: calc(320 / 240);
+            --vwidth: 60%;
+            width: var(--vwidth);
+            height: calc(var(--vwidth) / var(--ratio));
+        }
     </style>
     <script src="coi.js"></script>
     <script type='text/javascript' src="https://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/dist/FileSaver.min.js"> </script>
