@@ -40,6 +40,7 @@ jobs:
           source "/home/runner/work/raycaster/raycaster/emsdk/emsdk_env.sh"
           PLATFORM=PLATFORM_WEB make clean all
           rm docs/*.o
+          curl -L https://raw.githubusercontent.com/gzuidhof/coi-serviceworker/master/coi-serviceworker.min.js -o docs/coi.js
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
