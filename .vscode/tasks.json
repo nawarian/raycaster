@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "make all"
+    },
+    {
+      "label": "build and run",
+      "type": "shell",
+      "command": "make run"
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "make clean"
+    }
+  ]
+}
