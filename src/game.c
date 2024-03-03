@@ -14,7 +14,7 @@ RenderTexture2D framebuff;
 
 Camera2D cam = { 0 }; // game cam
 Camera2D tex_cam = { 0 }; // render cam
-float zoom = 3.0f;
+float zoom = 4.0f;
 
 void Create(void)
 {
