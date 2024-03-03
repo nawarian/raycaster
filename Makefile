@@ -14,6 +14,7 @@ RESDIR		= resources
 # Output name
 GAME_NAME	?= game
 ifeq ($(PLATFORM), PLATFORM_WEB)
+	BUILDDIR	= docs
 	GAME_NAME = index.html
 endif
 
