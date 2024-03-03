@@ -15,6 +15,9 @@ typedef enum {
 } RenderMode;
 
 extern RenderMode render_mode;
+
+#define MAX_RENDER_DISTANCE 1000.0f
+
 extern Camera2D cam;
 extern Camera2D tex_cam;
 

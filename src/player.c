@@ -37,41 +37,24 @@ void player_draw(void)
 {
   if (render_mode != RENDER2D) return;
 
+  // Draw player
+  DrawCircleV(Vector2Scale(player.pos, wall_size), 4.0f, RED);
+
+  // Draw sight direction
   Vector2 sight_dir, sight_end;
   float player_angle = Wrap(player.angle, 0.0f, 2 * PI);
 
-  // Draw FOV
-  for (int x = 0; x < screen_plane_w; ++x) {
-    float angle = player_angle - player.fov / screen_plane_w * x;
-    // Rotate by half player FOV, so line of sight is centered
-    angle = Wrap(angle + player.fov / 2.0f, 0.0f, 2 * PI);
-    sight_dir = (Vector2) {
-      cosf(angle),
-      sinf(angle)
-    };
-    sight_end = Vector2Add(Vector2Scale(sight_dir, 2.0f), player.pos);
-    DrawLineV(
-      Vector2Scale(player.pos, wall_size),
-      Vector2Scale(sight_end, wall_size),
-      ColorAlpha(GREEN, 0.1f)
-    );
-  }
-
-  // Draw sight direction
   sight_dir = (Vector2) {
     cosf(player_angle),
     sinf(player_angle)
   };
-  sight_end = Vector2Add(Vector2Scale(sight_dir, 0.5f), player.pos);
+  sight_end = Vector2Add(Vector2Scale(sight_dir, 0.3f), player.pos);
 
   DrawLineV(
     Vector2Scale(player.pos, wall_size),
     Vector2Scale(sight_end, wall_size),
     GOLD
   );
-
-  // Draw player
-  DrawCircleV(Vector2Scale(player.pos, wall_size), 4.0f, RED);
 }
 
 void player_destroy(void)

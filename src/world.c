@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "globals.h"
@@ -57,6 +58,7 @@ void _draw2D(void)
   WallKind wall;
   Color color;
 
+  // Draw walls
   for (int y = 0; y < world.dim.y; ++y) {
     for (int x = 0; x < world.dim.x; ++x) {
       wall = world.walls[y][x];
@@ -89,50 +91,98 @@ void _draw2D(void)
   }
 }
 
-// TODO: refactor to use DDA instead of a 1/64.0f factor
 void _draw3D(void)
 {
-  float player_angle = Wrap(player.angle, 0.0f, 2 * PI);
-  float fov_unit = player.fov / screen_plane_w;
-  float half_screen = screen_plane_h / 2;
-
+  WallKind wall;
   Color colors[] = {
     WHITE,
     RED,
     GRAY,
   };
 
+  float half_screen = screen_plane_h / 2.0f;
+  float player_angle = Wrap(player.angle, 0.0f, 2 * PI);
+  float fov_unit = player.fov / screen_plane_w;
+  float half_fov = player.fov / 2.0f;
+
+  // Iterate over all screen pixels
   for (int x = 0; x < screen_plane_w; ++x) {
-    // Calculate coords of next wall
-    float angle = Wrap((fov_unit * x) + player_angle - (player.fov / 2.0f), 0.0f, 2 * PI);
+    float angle = Wrap((fov_unit * x) + player_angle - half_fov, 0.0f, 2 * PI);
+    Vector2 map = (Vector2) { (int) player.pos.x, (int) player.pos.y };
+
     Vector2 dir = (Vector2) {
       cosf(angle),
       sinf(angle),
     };
 
-    Vector2 end = player.pos;
-    WallKind wall;
-    while (true) {
-      wall = world.walls[(int) end.y][(int) end.x];
-      if (wall != WALL_NONE) {
-        break;
-      }
+    Vector2 delta_dist = (Vector2) {
+      dir.x == 0.0f ? 1e30 : fabs(1.0f / dir.x),
+      dir.y == 0.0f ? 1e30 : fabs(1.0f / dir.y),
+    };
 
-      end = Vector2Add(end, Vector2Scale(dir, 1/64.0f));
+    Vector2 ray_length = Vector2Zero();
+    Vector2 step = Vector2Zero();
+
+    if (dir.x < 0) {
+      step.x = -1;
+      ray_length.x = (player.pos.x - map.x) * delta_dist.x;
+    } else {
+      step.x = 1;
+      ray_length.x = ((map.x + 1) - player.pos.x) * delta_dist.x;
     }
 
-    float dist = Vector2Distance(player.pos, end);
-    dist *= cosf(angle - player_angle);
+    if (dir.y < 0) {
+      step.y = -1;
+      ray_length.y = (player.pos.y - map.y) * delta_dist.y;
+    } else {
+      step.y = 1;
+      ray_length.y = ((map.y + 1) - player.pos.y) * delta_dist.y;
+    }
 
-    float wall_height = screen_plane_h / dist;
+    bool wall_found = false;
+    float dist = 0.0f;
+    while (!wall_found && dist < MAX_RENDER_DISTANCE) {
+      // Walk
+      if (ray_length.x < ray_length.y) {
+        map.x += step.x;
+        dist = ray_length.x;
+        ray_length.x += delta_dist.x;
+      } else {
+        map.y += step.y;
+        dist = ray_length.y;
+        ray_length.y += delta_dist.y;
+      }
 
-    DrawLine(
-      x,
-      half_screen - wall_height * 0.4,
-      x,
-      half_screen + wall_height * 0.4,
-      ColorAlpha(colors[wall], 1/dist)
-    );
+      // Check wall
+      if (map.x >= 0 && map.x < world.dim.x && map.y >= 0 && map.y < world.dim.y) {
+        wall = world.walls[(int) map.y][(int) map.x];
+
+        if (wall != WALL_NONE) {
+          wall_found = true;
+        }
+      }
+    }
+
+    if (wall_found) {
+      Vector2 end = Vector2Add(
+        player.pos,
+        Vector2Scale(dir, dist)
+      );
+
+      dist = Vector2Distance(player.pos, end);
+      // Fix fisheye effect
+      dist *= cosf(angle - player_angle);
+
+      float wall_height = screen_plane_h / dist;
+
+      DrawLine(
+        x,
+        half_screen - wall_height * 0.4f,
+        x,
+        half_screen + wall_height * 0.4f,
+        ColorAlpha(colors[wall], 1/dist)
+      );
+    }
   }
 }
 
