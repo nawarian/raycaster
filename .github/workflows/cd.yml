@@ -2,6 +2,16 @@ name: Github Pages build
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -19,9 +29,24 @@ jobs:
           ./emsdk install latest
           ./emsdk activate latest
           source ./emsdk_env.sh
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - name: Build Web
+        env:
+          ARTIFACT_DIR: ${{ runner.temp }}
         run: |
           source "/home/runner/work/raycaster/raycaster/emsdk/emsdk_env.sh"
           PLATFORM=PLATFORM_WEB make clean all
           rm docs/*.o
 
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages
+          path: docs/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
