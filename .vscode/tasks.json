@@ -9,7 +9,13 @@
     {
       "label": "build and run",
       "type": "shell",
-      "command": "make run"
+      "command": "make run",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "clear": true
+      }
     },
     {
       "label": "clean",
