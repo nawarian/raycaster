@@ -92,7 +92,7 @@ void _draw2D(void)
 // TODO: refactor to use DDA instead of a 1/64.0f factor
 void _draw3D(void)
 {
-  float player_angle = Wrap(player.angle - PI, 0.0f, 2 * PI);
+  float player_angle = Wrap(player.angle, 0.0f, 2 * PI);
   float fov_unit = player.fov / screen_plane_w;
   float half_screen = screen_plane_h / 2;
 

@@ -11,7 +11,7 @@ void player_create(void)
 {
   player.pos.x = 6.2f;
   player.pos.y = 2.5f;
-  player.angle = PI;
+  player.angle = 0.0f;
   player.fov = 90.0f * DEG2RAD;
 }
 
@@ -30,7 +30,7 @@ void player_update(void)
     cosf(player.angle),
     sinf(player.angle)
   };
-  player.pos = Vector2Add(player.pos, Vector2Scale(sight_dir, -delta.y));
+  player.pos = Vector2Add(player.pos, Vector2Scale(sight_dir, delta.y));
 }
 
 void player_draw(void)
@@ -38,7 +38,7 @@ void player_draw(void)
   if (render_mode != RENDER2D) return;
 
   Vector2 sight_dir, sight_end;
-  float player_angle = Wrap(player.angle - PI, 0.0f, 2 * PI);
+  float player_angle = Wrap(player.angle, 0.0f, 2 * PI);
 
   // Draw FOV
   for (int x = 0; x < screen_plane_w; ++x) {
