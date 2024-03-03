@@ -14,7 +14,7 @@ RenderTexture2D framebuff;
 
 Camera2D cam = { 0 }; // game cam
 Camera2D tex_cam = { 0 }; // render cam
-float zoom = 4.0f;
+float zoom = 3.0f;
 
 void Create(void)
 {
@@ -78,6 +78,7 @@ void Draw(void)
   EndMode2D();
 
   DrawFPS(0, 0);
+  DrawText(TextFormat("Press [TAB] to switch to %s", render_mode == RENDER2D ? "3D mode" : "2D mode"), 0, 20, 20, LIME);
 }
 
 void UpdateDraw(void)
