@@ -31,8 +31,14 @@
     <link rel="shortcut icon" href="https://www.raylib.com/favicon.ico">
     
     <style>
-        body { margin: 0px; }
-        canvas.emscripten { border: 0px none; background-color: black; }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            background: #000;
+        }
+        canvas.emscripten { border: 1px solid gold; background-color: black; }
     </style>
     <script src="coi.js"></script>
     <script type='text/javascript' src="https://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/dist/FileSaver.min.js"> </script>
