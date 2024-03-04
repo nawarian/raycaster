@@ -96,8 +96,8 @@ void _draw3D(void)
   WallKind wall;
   Color colors[] = {
     WHITE,
-    RED,
     GRAY,
+    RED
   };
 
   float half_screen = screen_plane_h / 2.0f;
